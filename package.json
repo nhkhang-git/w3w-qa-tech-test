@@ -1,0 +1,13 @@
+{
+    "name": "w3w-qa-tech-test",
+    "description": "w3w-qa-tech-test",
+    "scripts": {
+        "cypress:open": "cypress open --e2e",
+        "test": "cypress run --e2e 'cypress/integration/e2e/**/*.feature'"
+    },
+    "author": "what3words",
+    "devDependencies": {
+        "cypress": "^14.3.0",
+        "cypress-cucumber-preprocessor": "^4.3.1"
+    }
+}
