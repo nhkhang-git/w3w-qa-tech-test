@@ -31,3 +31,44 @@
 6. Define the page elements (sometimes may also include actions) in
    `cypress/support/pages` to avoid replicating element locators.
 7. Define all elements in this central place of page objects
+
+## CircleCI Integration
+
+### Available Commands
+
+```bash
+# Run tests with specific tags (local development)
+TAGS="@smoke" npm run test:tags
+TAGS="@regression" npm run test:tags  
+TAGS="@smoke,@search" npm run test:tags
+
+# Run tests with report generation (CI/Local)
+TAGS="@regression" npm run test:ci
+
+# Generate HTML report from existing test results
+npm run generate:report
+```
+
+### CircleCI Features
+
+- ✅ **Manual Triggers**: Run any tag combination via pipeline parameters
+- ✅ **Nightly Regression**: Automatic @regression execution at 2 AM UTC
+- ✅ **HTML Reports**: Beautiful reports available as CircleCI artifacts
+- ✅ **Pull Request Testing**: @smoke tests on feature branches
+- ✅ **Main Branch Testing**: @smoke → @regression sequence
+
+### Manual Trigger Usage
+
+1. Go to CircleCI → Your Project → "Trigger Pipeline"
+2. Add parameter: `test_tags` with value like:
+   - `@smoke` - Run smoke tests only
+   - `@regression` - Run full regression suite
+   - `@smoke,@search` - Run multiple tag combinations
+3. Click "Trigger Pipeline"
+
+### Viewing Reports
+
+After test execution:
+1. Go to CircleCI job → "Artifacts" tab
+2. Open `html-report/index.html` for detailed test results
+3. Check `test-summary.json` for execution statistics

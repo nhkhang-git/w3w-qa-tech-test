@@ -44,14 +44,10 @@ commands:
       - run:
           name: Run Cypress Tests - << parameters.job-name >>
           command: |
-            echo "Running tests with tags: << parameters.tags >>"
+            echo "🎯 Running tests with tags: << parameters.tags >>"
             export TAGS="<< parameters.tags >>"
-            npm run test:tags-with-report
+            npm run test:ci
           no_output_timeout: 15m
-      - run:
-          name: Generate HTML Report
-          command: npm run generate:report
-          when: always
       - store_test_results:
           path: cypress/reports
       - store_artifacts:
@@ -72,63 +68,22 @@ commands:
 
 # Define jobs
 jobs:
-  # Manual trigger job with custom tags
-  run-custom-tags:
+  # Generic test execution job - accepts any tags
+  run-tests:
     executor: cypress-executor
     parameters:
       tags:
         type: string
         default: "@smoke"
-    steps:
-      - checkout
-      - install-dependencies
-      - run-cypress-tests:
-          tags: << parameters.tags >>
-          job-name: "Custom Tags (<< parameters.tags >>)"
-
-  # Smoke tests job
-  run-smoke-tests:
-    executor: cypress-executor
-    steps:
-      - checkout
-      - install-dependencies
-      - run-cypress-tests:
-          tags: "@smoke"
-          job-name: "Smoke Tests"
-
-  # Regression tests job
-  run-regression-tests:
-    executor: cypress-executor
-    steps:
-      - checkout
-      - install-dependencies
-      - run-cypress-tests:
-          tags: "@regression"
-          job-name: "Regression Tests"
-
-  # Search tests job
-  run-search-tests:
-    executor: cypress-executor
-    steps:
-      - checkout
-      - install-dependencies
-      - run-cypress-tests:
-          tags: "@search"
-          job-name: "Search Tests"
-
-  # Combined tags job
-  run-multiple-tags:
-    executor: cypress-executor
-    parameters:
-      tags:
+      job-name:
         type: string
-        default: "@smoke,@regression"
+        default: "Tests"
     steps:
       - checkout
       - install-dependencies
       - run-cypress-tests:
           tags: << parameters.tags >>
-          job-name: "Multiple Tags (<< parameters.tags >>)"
+          job-name: << parameters.job-name >>
 
 # Define workflows
 workflows:
@@ -140,8 +95,10 @@ workflows:
       and:
         - equal: [manual, << pipeline.trigger_source >>]
     jobs:
-      - run-custom-tags:
+      - run-tests:
+          name: "Manual Testing"
           tags: << pipeline.parameters.test_tags >>
+          job-name: "Manual (<< pipeline.parameters.test_tags >>)"
 
   # Nightly regression workflow - runs every night at 2 AM UTC
   nightly-regression:
@@ -154,7 +111,10 @@ workflows:
                 - main
                 - master
     jobs:
-      - run-regression-tests
+      - run-tests:
+          name: "Nightly Regression"
+          tags: "@regression"
+          job-name: "Nightly Regression"
 
   # Pull Request workflow - runs smoke tests on PRs
   pull-request-testing:
@@ -162,7 +122,10 @@ workflows:
       not:
         equal: [scheduled_pipeline, << pipeline.trigger_source >>]
     jobs:
-      - run-smoke-tests:
+      - run-tests:
+          name: "PR Smoke Tests"
+          tags: "@smoke"
+          job-name: "PR Smoke Tests"
           filters:
             branches:
               ignore:
@@ -175,15 +138,21 @@ workflows:
       not:
         equal: [scheduled_pipeline, << pipeline.trigger_source >>]
     jobs:
-      - run-smoke-tests:
+      - run-tests:
+          name: "Main Branch Smoke"
+          tags: "@smoke"
+          job-name: "Main Branch Smoke"
           filters:
             branches:
               only:
                 - main
                 - master
-      - run-regression-tests:
+      - run-tests:
+          name: "Main Branch Regression"
+          tags: "@regression"
+          job-name: "Main Branch Regression"
           requires:
-            - run-smoke-tests
+            - "Main Branch Smoke"
           filters:
             branches:
               only:

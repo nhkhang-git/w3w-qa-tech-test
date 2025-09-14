@@ -4,13 +4,9 @@
     "scripts": {
         "cypress:open": "cypress open --e2e",
         "test": "cypress run --e2e 'cypress/integration/e2e/**/*.feature'",
-        "test:smoke": "cypress run --e2e --env tags='@smoke'",
-        "test:regression": "cypress run --e2e --env tags='@regression'",
-        "test:search": "cypress run --e2e --env tags='@search'",
-        "test:custom-tags": "cypress run --e2e --env tags=\"${TAGS:-@smoke}\"",
+        "test:tags": "cypress run --e2e --env tags=\"${TAGS:-@smoke}\"",
         "generate:report": "node scripts/generate-html-report.js",
-        "test:with-report": "npm run test && npm run generate:report",
-        "test:tags-with-report": "npm run test:custom-tags && npm run generate:report"
+        "test:ci": "npm run test:tags && npm run generate:report"
     },
     "author": "what3words",
     "devDependencies": {
