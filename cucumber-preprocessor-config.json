@@ -4,5 +4,7 @@
         "outputFolder": "cypress/reports/cucumber-json",
         "filePrefix": "",
         "fileSuffix": ".cucumber"
-    }
+    },
+    "filterSpecs": true,
+    "omitFiltered": true
 }

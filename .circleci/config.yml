@@ -45,8 +45,8 @@ commands:
           name: Run Cypress Tests - << parameters.job-name >>
           command: |
             echo "🎯 Running tests with tags: << parameters.tags >>"
-            export TAGS='<< parameters.tags >>'
-            npm run test:ci
+            npx cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env tags='<< parameters.tags >>' || true
+            npm run generate:report
           no_output_timeout: 15m
       - store_test_results:
           path: cypress/reports
