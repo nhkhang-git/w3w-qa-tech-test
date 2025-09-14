@@ -92,11 +92,21 @@ workflows:
   # Manual trigger workflow - can be triggered with parameters
   manual-testing:
     when:
-      and:
-        - equal: [manual, << pipeline.trigger_source >>]
+      equal: [api, << pipeline.trigger_source >>]
     jobs:
       - run-tests:
           name: "Manual Testing"
+          tags: << pipeline.parameters.test_tags >>
+          job-name: "Manual (<< pipeline.parameters.test_tags >>)"
+
+  # Alternative manual trigger - works when parameter is provided
+  manual-trigger-alternative:
+    when:
+      not:
+        equal: ["@smoke", << pipeline.parameters.test_tags >>]
+    jobs:
+      - run-tests:
+          name: "Manual Run"
           tags: << pipeline.parameters.test_tags >>
           job-name: "Manual (<< pipeline.parameters.test_tags >>)"
 
