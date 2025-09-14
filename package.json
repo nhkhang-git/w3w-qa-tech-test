@@ -5,9 +5,9 @@
         "cypress:open": "cypress open --e2e",
         "test": "cypress run --e2e 'cypress/integration/e2e/**/*.feature'",
         "test:tags": "cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature'",
-        "test:smoke": "cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env tags='@smoke'",
-        "test:regression": "cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env tags='@regression'",
-        "test:search": "cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env tags='@search'",
+        "test:smoke": "cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env TAGS='@smoke'",
+        "test:regression": "cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env TAGS='@regression'",
+        "test:search": "cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env TAGS='@search'",
         "generate:report": "node scripts/generate-html-report.js",
         "test:ci": "npm run test:tags && npm run generate:report"
     },

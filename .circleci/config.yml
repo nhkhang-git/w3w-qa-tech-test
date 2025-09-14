@@ -45,7 +45,7 @@ commands:
           name: Run Cypress Tests - << parameters.job-name >>
           command: |
             echo "🎯 Running tests with tags: << parameters.tags >>"
-            npx cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env tags='<< parameters.tags >>' || true
+            npx cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env TAGS='<< parameters.tags >>' || true
             npm run generate:report
           no_output_timeout: 15m
       - store_test_results:
@@ -99,17 +99,6 @@ workflows:
           tags: << pipeline.parameters.test_tags >>
           job-name: "Manual (<< pipeline.parameters.test_tags >>)"
 
-  # Alternative manual trigger - works when parameter is provided
-  manual-trigger-alternative:
-    when:
-      not:
-        equal: ["@smoke", << pipeline.parameters.test_tags >>]
-    jobs:
-      - run-tests:
-          name: "Manual Run"
-          tags: << pipeline.parameters.test_tags >>
-          job-name: "Manual (<< pipeline.parameters.test_tags >>)"
-
   # Nightly regression workflow - runs every night at 2 AM UTC
   nightly-regression:
     triggers:
@@ -145,8 +134,11 @@ workflows:
   # Main branch workflow - runs comprehensive tests
   main-branch-testing:
     when:
-      not:
-        equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+      and:
+        - not:
+            equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+        - not:
+            equal: [api, << pipeline.trigger_source >>]
     jobs:
       - run-tests:
           name: "Main Branch Regression"
