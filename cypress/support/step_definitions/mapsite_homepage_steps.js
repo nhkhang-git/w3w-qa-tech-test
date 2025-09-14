@@ -1,5 +1,5 @@
 import { Given, Then } from "cypress-cucumber-preprocessor/steps";
-import { MapSiteHomePageAction } from "../actions/map_site/MapSiteHompageAction";
+import { MapSiteHomePageAction } from "../actions/map_site/mapSiteHompageAction";
 
 Given(/^a user visits w3w mapsite and accepts cookies$/, () => {
   MapSiteHomePageAction.visitMapSite().then(() => {
