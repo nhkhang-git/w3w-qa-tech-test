@@ -1,0 +1,198 @@
+version: 2.1
+
+# Define reusable executors
+executors:
+  cypress-executor:
+    docker:
+      - image: cypress/browsers:node18.12.0-chrome107-ff106-edge
+    working_directory: ~/repo
+
+# Define reusable commands
+commands:
+  install-dependencies:
+    description: "Install npm dependencies with caching"
+    steps:
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install Dependencies
+          command: npm ci
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+
+  run-cypress-tests:
+    description: "Run Cypress tests with specified tags"
+    parameters:
+      tags:
+        type: string
+        default: "@smoke"
+      job-name:
+        type: string
+        default: "cypress-tests"
+    steps:
+      - run:
+          name: Create Reports Directory
+          command: |
+            mkdir -p cypress/reports/cucumber-json
+            mkdir -p cypress/reports/html
+            mkdir -p cypress/reports/screenshots
+            mkdir -p cypress/reports/videos
+      - run:
+          name: Run Cypress Tests - << parameters.job-name >>
+          command: |
+            echo "Running tests with tags: << parameters.tags >>"
+            export TAGS="<< parameters.tags >>"
+            npm run test:tags-with-report
+          no_output_timeout: 15m
+      - run:
+          name: Generate HTML Report
+          command: npm run generate:report
+          when: always
+      - store_test_results:
+          path: cypress/reports
+      - store_artifacts:
+          path: cypress/reports/html
+          destination: html-report
+      - store_artifacts:
+          path: cypress/reports/cucumber-json
+          destination: json-reports
+      - store_artifacts:
+          path: cypress/reports/test-summary.json
+          destination: test-summary
+      - store_artifacts:
+          path: cypress/screenshots
+          destination: screenshots
+      - store_artifacts:
+          path: cypress/videos
+          destination: videos
+
+# Define jobs
+jobs:
+  # Manual trigger job with custom tags
+  run-custom-tags:
+    executor: cypress-executor
+    parameters:
+      tags:
+        type: string
+        default: "@smoke"
+    steps:
+      - checkout
+      - install-dependencies
+      - run-cypress-tests:
+          tags: << parameters.tags >>
+          job-name: "Custom Tags (<< parameters.tags >>)"
+
+  # Smoke tests job
+  run-smoke-tests:
+    executor: cypress-executor
+    steps:
+      - checkout
+      - install-dependencies
+      - run-cypress-tests:
+          tags: "@smoke"
+          job-name: "Smoke Tests"
+
+  # Regression tests job
+  run-regression-tests:
+    executor: cypress-executor
+    steps:
+      - checkout
+      - install-dependencies
+      - run-cypress-tests:
+          tags: "@regression"
+          job-name: "Regression Tests"
+
+  # Search tests job
+  run-search-tests:
+    executor: cypress-executor
+    steps:
+      - checkout
+      - install-dependencies
+      - run-cypress-tests:
+          tags: "@search"
+          job-name: "Search Tests"
+
+  # Combined tags job
+  run-multiple-tags:
+    executor: cypress-executor
+    parameters:
+      tags:
+        type: string
+        default: "@smoke,@regression"
+    steps:
+      - checkout
+      - install-dependencies
+      - run-cypress-tests:
+          tags: << parameters.tags >>
+          job-name: "Multiple Tags (<< parameters.tags >>)"
+
+# Define workflows
+workflows:
+  version: 2
+
+  # Manual trigger workflow - can be triggered with parameters
+  manual-testing:
+    when:
+      and:
+        - equal: [manual, << pipeline.trigger_source >>]
+    jobs:
+      - run-custom-tags:
+          tags: << pipeline.parameters.test_tags >>
+
+  # Nightly regression workflow - runs every night at 2 AM UTC
+  nightly-regression:
+    triggers:
+      - schedule:
+          cron: "0 2 * * *" # 2 AM UTC every day
+          filters:
+            branches:
+              only:
+                - main
+                - master
+    jobs:
+      - run-regression-tests
+
+  # Pull Request workflow - runs smoke tests on PRs
+  pull-request-testing:
+    when:
+      not:
+        equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+    jobs:
+      - run-smoke-tests:
+          filters:
+            branches:
+              ignore:
+                - main
+                - master
+
+  # Main branch workflow - runs comprehensive tests
+  main-branch-testing:
+    when:
+      not:
+        equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+    jobs:
+      - run-smoke-tests:
+          filters:
+            branches:
+              only:
+                - main
+                - master
+      - run-regression-tests:
+          requires:
+            - run-smoke-tests
+          filters:
+            branches:
+              only:
+                - main
+                - master
+
+# Pipeline parameters for manual triggers
+parameters:
+  test_tags:
+    type: string
+    default: "@smoke"
+    description: "Cucumber tags to run (e.g., @smoke, @regression, @smoke,@search)"

@@ -8,7 +8,7 @@ Feature: What3Words Map Site Search Functionality
     And I wait for the map page to be ready
     And I close the onboarding prompt
 
-  @search @positive @threeword
+  @search @regression @smoke
   Scenario Outline: Search by 3 word address
     When I search for "<three_word_address>"
     Then I should see search suggestions
@@ -19,7 +19,7 @@ Feature: What3Words Map Site Search Functionality
       | three_word_address    | note                           |
       | certified.potato.vine | Standard 3-word address format |
 
-  @search @positive
+  @search @regression
   Scenario Outline: Search by normal address
     When I search for "<normal_address>"
     Then I should see search suggestions
@@ -30,7 +30,7 @@ Feature: What3Words Map Site Search Functionality
       | normal_address | expected_address   |
       | Tower Bridge   | Tower Bridge hotel |
 
-  @search @positive
+  @search @regression
   Scenario Outline: Change language and search by coordinates
     When I open the menu and select the three word address language menu setting
     And I change the language to "<target_language>"
@@ -45,7 +45,7 @@ Feature: What3Words Map Site Search Functionality
       | target_language | latitude  | longitude   | note                                  |
       | German          | 51.521251 | -0.20358600 | Search coordinates in German language |
 
-  @search @negative
+  @search @regression @smoke
   Scenario Outline: Search invalid addresses
     When I search for "<invalid_address>"
     Then I should see an error message "No address found."
