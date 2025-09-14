@@ -130,6 +130,18 @@ function generateSummaryJSON() {
 
 // Main execution
 try {
+  console.log("🔍 DEBUG: Checking for JSON files...");
+  console.log("📂 Working directory:", process.cwd());
+  console.log("📁 Reports directory:", path.resolve("cypress/reports"));
+
+  const jsonDir = path.join("cypress/reports", "cucumber-json");
+  if (fs.existsSync(jsonDir)) {
+    const files = fs.readdirSync(jsonDir);
+    console.log("📊 Files found in cucumber-json:", files);
+  } else {
+    console.log("❌ cucumber-json directory does not exist");
+  }
+
   generateHTMLReport();
   generateSummaryJSON();
 } catch (error) {

@@ -4,7 +4,7 @@
     "scripts": {
         "cypress:open": "cypress open --e2e",
         "test": "cypress run --e2e 'cypress/integration/e2e/**/*.feature'",
-        "test:tags": "cypress run --e2e --env tags=\"${TAGS:-@smoke}\"",
+        "test:tags": "cypress run --e2e --spec 'cypress/integration/e2e/**/*.feature' --env tags=\"${TAGS:-@smoke}\"",
         "generate:report": "node scripts/generate-html-report.js",
         "test:ci": "npm run test:tags && npm run generate:report"
     },
