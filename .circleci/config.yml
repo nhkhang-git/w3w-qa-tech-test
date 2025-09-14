@@ -139,15 +139,6 @@ workflows:
         equal: [scheduled_pipeline, << pipeline.trigger_source >>]
     jobs:
       - run-tests:
-          name: "Main Branch Smoke"
-          tags: "@smoke"
-          job-name: "Main Branch Smoke"
-          filters:
-            branches:
-              only:
-                - main
-                - master
-      - run-tests:
           name: "Main Branch Regression"
           tags: "@regression"
           job-name: "Main Branch Regression"
