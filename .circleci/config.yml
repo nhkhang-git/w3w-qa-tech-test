@@ -142,8 +142,6 @@ workflows:
           name: "Main Branch Regression"
           tags: "@regression"
           job-name: "Main Branch Regression"
-          requires:
-            - "Main Branch Smoke"
           filters:
             branches:
               only:
