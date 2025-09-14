@@ -1,0 +1,8 @@
+{
+    "cucumberJson": {
+        "generate": true,
+        "outputFolder": "cypress/reports/cucumber-json",
+        "filePrefix": "",
+        "fileSuffix": ".cucumber"
+    }
+}

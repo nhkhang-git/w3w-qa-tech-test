@@ -2,16 +2,9 @@ const report = require("multiple-cucumber-html-reporter");
 const fs = require("fs");
 const path = require("path");
 
-// Ensure reports directory exists
+// Set up report directories
 const reportsDir = "cypress/reports";
-if (!fs.existsSync(reportsDir)) {
-  fs.mkdirSync(reportsDir, { recursive: true });
-}
-
 const htmlReportsDir = path.join(reportsDir, "html");
-if (!fs.existsSync(htmlReportsDir)) {
-  fs.mkdirSync(htmlReportsDir, { recursive: true });
-}
 
 // Function to get all JSON files from cucumber-json directory
 function getJsonReports() {
@@ -37,8 +30,6 @@ function generateHTMLReport() {
     return;
   }
 
-  console.log(`📊 Found ${jsonFiles.length} JSON report file(s). Generating HTML report...`);
-
   report.generate({
     jsonDir: path.join(reportsDir, "cucumber-json"),
     reportPath: htmlReportsDir,
@@ -63,13 +54,6 @@ function generateHTMLReport() {
   });
 
   console.log("✅ HTML report generated successfully!");
-  console.log(`📂 Report location: ${path.resolve(htmlReportsDir)}`);
-
-  // Log report file for CircleCI artifacts
-  const reportFile = path.join(htmlReportsDir, "index.html");
-  if (fs.existsSync(reportFile)) {
-    console.log(`🌐 Main report file: ${reportFile}`);
-  }
 }
 
 // Function to create summary JSON for CircleCI
@@ -142,20 +126,12 @@ function generateSummaryJSON() {
 
   const summaryFile = path.join(reportsDir, "test-summary.json");
   fs.writeFileSync(summaryFile, JSON.stringify(summary, null, 2));
-
-  console.log("📋 Test Summary:");
-  console.log(`   Features: ${totalFeatures}`);
-  console.log(`   Scenarios: ${passedScenarios}/${totalScenarios} passed (${summary.passRate}%)`);
-  console.log(`   Tags: ${Object.keys(tagSummary).join(", ")}`);
-  console.log(`📄 Summary saved to: ${summaryFile}`);
 }
 
 // Main execution
 try {
-  console.log("🚀 Starting report generation...");
   generateHTMLReport();
   generateSummaryJSON();
-  console.log("✅ Report generation completed successfully!");
 } catch (error) {
   console.error("❌ Report generation failed:", error.message);
   process.exit(1);
