@@ -19,8 +19,9 @@ Feature: What3Words Map Site Search Functionality
       | three_word_address    | note                           |
       | certified.potato.vine | Standard 3-word address format |
 
-  @search @regression
+  @search @regression @smoke
   Scenario Outline: Search by normal address
+    Given I navigate to the specific location "daring.lion.race"
     When I search for "<normal_address>"
     Then I should see search suggestions
     And I select the suggestion with address "<expected_address>"
@@ -45,7 +46,7 @@ Feature: What3Words Map Site Search Functionality
       | target_language | latitude  | longitude   | note                                  |
       | German          | 51.521251 | -0.20358600 | Search coordinates in German language |
 
-  @search @regression @smoke
+  @search @regression
   Scenario Outline: Search invalid addresses
     When I search for "<invalid_address>"
     Then I should see an error message "No address found."

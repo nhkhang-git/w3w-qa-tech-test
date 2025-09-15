@@ -5,6 +5,11 @@ export class MapSiteHomePageAction {
     return cy.visit(Cypress.env("mapSiteUrl"));
   }
 
+  static visitSpecificLocation(threeWordAddress) {
+    const fullUrl = `${Cypress.env("mapSiteUrl")}/${threeWordAddress}`;
+    return cy.visit(fullUrl);
+  }
+
   static acceptCookies() {
     return MapSiteHomePage.getAcceptCookies().click();
   }
