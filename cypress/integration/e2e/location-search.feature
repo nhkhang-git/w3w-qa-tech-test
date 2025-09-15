@@ -6,8 +6,9 @@ Feature: What3Words Map Site Search Functionality
   Background:
     Given a user visits w3w mapsite and accepts cookies
     And I wait for the map page to be ready
+    And I close the onboarding prompt
 
-  @search @regression
+  @search @regression @smoke
   Scenario Outline: Search by 3 word address
     When I search for "<three_word_address>"
     Then I should see search suggestions
@@ -20,6 +21,7 @@ Feature: What3Words Map Site Search Functionality
 
   @search @regression @smoke
   Scenario Outline: Search by normal address
+    Given I navigate to the specific location "daring.lion.race"
     When I search for "<normal_address>"
     Then I should see search suggestions
     And I select the suggestion with address "<expected_address>"

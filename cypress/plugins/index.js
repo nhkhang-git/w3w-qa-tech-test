@@ -16,7 +16,7 @@ const cucumber = require("cypress-cucumber-preprocessor").default;
 
 module.exports = async (on, config) => {
   on("file:preprocessor", cucumber());
-  config.env.mapSiteUrl = "https://what3words.com/daring.lion.race";
+  config.env.mapSiteUrl = "https://what3words.com";
 
   // Support TAGS environment variable for cucumber tag filtering
   if (config.env.TAGS) {

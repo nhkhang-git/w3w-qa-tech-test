@@ -11,6 +11,10 @@ Given(/^I wait for the map page to be ready$/, () => {
   cy.waitForMapPageReady();
 });
 
+Given(/^I navigate to the specific location "([^"]*)"$/, (threeWordAddress) => {
+  MapSiteHomePageAction.visitSpecificLocation(threeWordAddress);
+});
+
 Then(/^I close the onboarding prompt$/, () => {
   MapSiteHomePageAction.closeOnboardingPrompt();
 });
